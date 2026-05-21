@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Highlight Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI elements -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <i class="ph-fill ph-video-camera"></i>
+                <h1>Highlight Analyzer</h1>
+            </div>
+            <div class="controls">
+                <label for="video-upload" class="upload-btn">
+                    <i class="ph ph-upload-simple"></i>
+                    Upload Video
+                </label>
+                <input type="file" id="video-upload" accept="video/mp4, video/webm, video/ogg" hidden>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="workspace-area">
+                <div class="preview-section" id="drop-zone">
+                    <div class="upload-placeholder" id="upload-placeholder">
+                        <div class="icon-container">
+                            <i class="ph ph-film-strip"></i>
+                        </div>
+                        <h2>Drag & Drop your video here</h2>
+                        <p>or click 'Upload Video' in the top right</p>
+                    </div>
+                    <div class="video-container hidden" id="video-container">
+                        <video id="main-video"></video>
+                        <div class="overlay-info hidden" id="overlay-info">
+                            <span class="status-badge" id="status-badge">Analyzing...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inspector-panel hidden" id="inspector-panel">
+                    <div class="inspector-header">
+                        <h3><i class="ph ph-sliders"></i> SFX Inspector</h3>
+                        <button class="close-btn" id="close-inspector-btn"><i class="ph ph-x"></i></button>
+                    </div>
+                    <div class="inspector-body">
+                        <div class="selected-time">Time: <span id="inspector-time">00:00</span></div>
+                        <div class="emotion-selector-wrapper">
+                            <label>Emotion Category</label>
+                            <div class="emotion-grid">
+                                <button class="emotion-btn" data-emotion="inspiration" title="ひらめき">💡 ひらめき</button>
+                                <button class="emotion-btn" data-emotion="surprise" title="驚き">😲 驚き</button>
+                                <button class="emotion-btn" data-emotion="disappointment" title="落胆">😭 落胆</button>
+                                <button class="emotion-btn" data-emotion="shyness" title="照れ">😳 照れ</button>
+                                <button class="emotion-btn" data-emotion="question" title="疑問">❓ 疑問</button>
+                                <button class="emotion-btn" data-emotion="laughter" title="笑い">😂 笑い</button>
+                            </div>
+                        </div>
+                        <div class="sfx-recommendation">
+                            <label>Recommended SFX</label>
+                            <div class="sfx-name" id="inspector-sfx-name">ピコーン！</div>
+                        </div>
+                        <button class="action-btn play-sfx-btn" id="play-sfx-btn">
+                            <i class="ph-fill ph-play-circle"></i> Play Sample Sound
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-section">
+                <div class="timeline-header">
+                    <div class="timeline-controls">
+                        <button class="icon-btn" id="play-pause-btn"><i class="ph-fill ph-play"></i></button>
+                        <span class="time-display" id="time-display">00:00 / 00:00</span>
+                    </div>
+                    <div class="timeline-tools">
+                        <span class="legend-item"><span class="color-box emotion-inspiration"></span>💡 ひらめき</span>
+                        <span class="legend-item"><span class="color-box emotion-surprise"></span>😲 驚き</span>
+                        <span class="legend-item"><span class="color-box emotion-disappointment"></span>😭 落胆</span>
+                        <span class="legend-item"><span class="color-box emotion-shyness"></span>😳 照れ</span>
+                        <span class="legend-item"><span class="color-box emotion-question"></span>❓ 疑問</span>
+                        <span class="legend-item"><span class="color-box emotion-laughter"></span>😂 笑い</span>
+                    </div>
+                </div>
+
+                <div class="timeline-editor-wrapper">
+                    <div class="timeline-track-labels">
+                        <div class="track-label ruler-label">Time</div>
+                        <div class="track-label video-label">Video</div>
+                        <div class="track-label audio-label">Audio</div>
+                        <div class="track-label sfx-label">SFX Rec</div>
+                        <div class="track-label analysis-label">Excitement</div>
+                    </div>
+                    
+                    <div class="timeline-scroll-area" id="timeline-scroll-area">
+                        <!-- Playhead -->
+                        <div class="playhead" id="playhead"></div>
+
+                        <!-- Tracks -->
+                        <div class="timeline-tracks" id="timeline-tracks">
+                            <div class="track ruler-track" id="ruler-track"></div>
+                            <div class="track video-track" id="video-track"></div>
+                            <div class="track audio-track" id="audio-track"><canvas id="audio-waveform"></canvas></div>
+                            <div class="track sfx-track" id="sfx-track"></div>
+                            <div class="track analysis-track" id="analysis-track"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Hidden canvas for thumbnail extraction -->
+        <canvas id="thumbnail-canvas" hidden></canvas>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
