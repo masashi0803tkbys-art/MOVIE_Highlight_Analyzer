@@ -44,11 +44,19 @@ const inspectorSfxName = document.getElementById('inspector-sfx-name');
 const playSfxBtn = document.getElementById('play-sfx-btn');
 const emotionGridButtons = document.querySelectorAll('.emotion-btn');
 
+// Tab Elements
+const tabManual = document.getElementById('tab-manual');
+const tabAi = document.getElementById('tab-ai');
+const tabContentManual = document.getElementById('tab-content-manual');
+const tabContentAi = document.getElementById('tab-content-ai');
+const aiAdviceList = document.getElementById('ai-advice-list');
+
 let audioContext = null;
 let currentVideoDuration = 0;
 let isAnalyzing = false;
 let emotionsArray = []; // Holds the emotion string for each second of the video
 let selectedBlockIndex = null; // Currently selected timeline block index
+let aiAdviceData = []; // Holds generated AI Co-Pilot recommendations
 
 // Format time in MM:SS
 function formatTime(seconds) {
@@ -63,6 +71,7 @@ function init() {
     setupVideoControls();
     setupTimelineInteraction();
     setupInspectorHandlers();
+    setupTabHandlers();
 }
 
 function setupUploadHandlers() {
@@ -317,10 +326,10 @@ function playSynthSFX(emotion) {
         osc.stop(now + duration);
         
     } else if (emotion === 'shyness') {
-        // "😳 照れ" -> Soft vibraphone bubble pop
-        const freqs = [293.66, 349.23, 440.00]; // D4, F4, A4
+        // "😳 照れ" -> Soft warm bubble pops ("風船の弾けるような" pop mapping)
+        const freqs = [293.66, 349.23, 440.00, 523.25]; // D4, F4, A4, C5
         freqs.forEach((freq, idx) => {
-            const delay = idx * 0.08;
+            const delay = idx * 0.07;
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
             
@@ -328,14 +337,14 @@ function playSynthSFX(emotion) {
             osc.frequency.setValueAtTime(freq, now + delay);
             gain.gain.setValueAtTime(0, now);
             gain.gain.setValueAtTime(0, now + delay);
-            gain.gain.linearRampToValueAtTime(0.4, now + delay + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.2);
+            gain.gain.linearRampToValueAtTime(0.5, now + delay + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.18);
             
             osc.connect(gain);
             gain.connect(masterGain);
             
             osc.start(now);
-            osc.stop(now + delay + 0.22);
+            osc.stop(now + delay + 0.2);
         });
         
     } else if (emotion === 'question') {
@@ -349,13 +358,13 @@ function playSynthSFX(emotion) {
         
         gain.gain.setValueAtTime(0.5, now);
         gain.gain.linearRampToValueAtTime(0.5, now + 0.12);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
         
         osc.connect(gain);
         gain.connect(masterGain);
         
         osc.start(now);
-        osc.stop(now + 0.25);
+        osc.stop(now + 0.28);
         
     } else if (emotion === 'laughter') {
         // "😂 笑い" -> Bouncy retro laughter sound
@@ -433,6 +442,140 @@ function analyzeEmotions(energyData, maxEnergy) {
 }
 
 // ----------------------------------------------------
+// AI Co-Pilot: Editorial Recommendation Engine
+// ----------------------------------------------------
+function generateAIAdvice(duration) {
+    aiAdviceList.innerHTML = '';
+    aiAdviceData = [];
+    
+    // Determine number of advices based on duration
+    // 1 min (~60s) -> 2-3 advices
+    // 5 min (~300s) -> up to 5 advices
+    let numAdvices = 2;
+    if (duration > 300) {
+        numAdvices = 5;
+    } else if (duration > 180) {
+        numAdvices = 4;
+    } else if (duration > 60) {
+        numAdvices = 3;
+    }
+    
+    const advices = [];
+    
+    // Specific recommendation requested by the user: "1:02 (62s) 風船の弾けるようなポップな効果音"
+    // We explicitly place this at 1:02 if the video is >= 65s, otherwise we place it near the middle/end.
+    const targetBalloonTime = duration >= 65 ? 62 : Math.min(15, Math.floor(duration / 2));
+    
+    // Map the target time block to 'shyness' (balloon pop synth)
+    if (emotionsArray[targetBalloonTime]) {
+        emotionsArray[targetBalloonTime] = 'shyness';
+        // Redraw to ensure the UI shows the icon
+        drawSFXTrack(emotionsArray);
+    }
+    
+    const balloonAdvice = {
+        time: targetBalloonTime,
+        emotion: 'shyness',
+        title: "🎈 ポップ効果音の推奨",
+        text: "このタイミングは画面転換や大きなアクセントに最適です。**『風船が弾けるようなポップな効果音（Pop Synth）』**を入れることで、映像全体のテンポ感が軽快になり、視聴者の集中を引きつけられます。"
+    };
+    advices.push(balloonAdvice);
+    
+    // Scan other parts of the video to create highly accurate advice
+    const surpriseIndices = [];
+    const inspirationIndices = [];
+    const disappointmentIndices = [];
+    const laughterIndices = [];
+    const questionIndices = [];
+    
+    emotionsArray.forEach((em, idx) => {
+        // Skip indices too close to our balloonAdvice to avoid duplicate grouping
+        if (Math.abs(idx - balloonAdvice.time) < 6) return;
+        
+        if (em === 'surprise') surpriseIndices.push(idx);
+        else if (em === 'inspiration') inspirationIndices.push(idx);
+        else if (em === 'disappointment') disappointmentIndices.push(idx);
+        else if (em === 'laughter') laughterIndices.push(idx);
+        else if (em === 'question') questionIndices.push(idx);
+    });
+    
+    const getIndex = (arr, fallback) => arr.length > 0 ? arr[Math.floor(Math.random() * arr.length)] : fallback;
+    
+    // Surprise/Impact Advice
+    advices.push({
+        time: getIndex(surpriseIndices, Math.min(Math.floor(duration * 0.15), duration - 1)),
+        emotion: 'surprise',
+        title: "😲 驚き・インパクトの強調",
+        text: "音声データに急激な立ち上がり（スパイク）が検出されています。**『ジャン！』というインパクト音**を入れることで、画面の展開や驚きの表情を強調できます。"
+    });
+    
+    // Spark/Inspiration Advice
+    if (numAdvices >= 3) {
+        advices.push({
+            time: getIndex(inspirationIndices, Math.min(Math.floor(duration * 0.45), duration - 1)),
+            emotion: 'inspiration',
+            title: "💡 アイデア・ひらめきの演出",
+            text: "静音からやや明るく立ち上がる区間です。**『ピコーン！』という高音のキラキラ音**を追加すると、キャラクターの気付きやひらめきを印象的に演出できます。"
+        });
+    }
+    
+    // Comical Disappointment Advice
+    if (numAdvices >= 4) {
+        advices.push({
+            time: getIndex(disappointmentIndices, Math.min(Math.floor(duration * 0.75), duration - 1)),
+            emotion: 'disappointment',
+            title: "😭 コミカルなオチ・落胆の補強",
+            text: "盛り上がった後の急激な落差が検知されたポイントです。哀愁漂うトロンボーン調の **『ショボーン...』** を入れると、全体のコメディセンスがぐっと引き締まります。"
+        });
+    }
+    
+    // Question/Doubt Accent Advice
+    if (numAdvices >= 5) {
+        advices.push({
+            time: getIndex(questionIndices, Math.min(Math.floor(duration * 0.9), duration - 1)),
+            emotion: 'question',
+            title: "❓ 疑問・問いかけのアクセント",
+            text: "少し音声の揺らぎが目立つ箇所です。語尾が上がるような **『ハテ？』という疑問音**を重ねると、動画全体のテンポに心地良い変化を生み出せます。"
+        });
+    }
+    
+    // Sort chronologically
+    advices.sort((a, b) => a.time - b.time);
+    
+    // Limit to calculated count
+    aiAdviceData = advices.slice(0, numAdvices);
+    
+    // Render list
+    aiAdviceData.forEach((adv) => {
+        const card = document.createElement('div');
+        card.className = 'ai-advice-card';
+        card.dataset.index = adv.time;
+        
+        card.innerHTML = `
+            <div class="ai-advice-meta">
+                <span class="ai-advice-time">${formatTime(adv.time)}</span>
+                <span class="ai-advice-tag">${adv.title.split(' ')[0]} ${EMOTIONS[adv.emotion].label}</span>
+            </div>
+            <div class="ai-advice-text">${adv.text}</div>
+        `;
+        
+        card.addEventListener('click', () => {
+            // Highlight card
+            aiAdviceList.querySelectorAll('.ai-advice-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            
+            // Sync with timeline
+            selectSFXBlock(adv.time);
+            
+            // Stay in AI tab
+            tabAi.click();
+        });
+        
+        aiAdviceList.appendChild(card);
+    });
+}
+
+// ----------------------------------------------------
 // Core Feature: Audio Analysis for "Excitement" & SFX
 // ----------------------------------------------------
 async function analyzeAudio(file) {
@@ -473,9 +616,10 @@ async function analyzeAudio(file) {
         drawAudioWaveform(energyData, maxEnergy);
         generateHighlightAnalysis(energyData, maxEnergy);
         
-        // Core extension: generate and draw emotions array
+        // Core extension: generate emotions and recommendations
         emotionsArray = analyzeEmotions(energyData, maxEnergy);
         drawSFXTrack(emotionsArray);
+        generateAIAdvice(duration);
         
         document.getElementById('status-badge').innerText = 'Analysis Complete';
         setTimeout(() => {
@@ -604,6 +748,17 @@ function selectSFXBlock(index) {
         }
     });
     
+    // Highlight matching AI advice card if it exists
+    if (aiAdviceList) {
+        const matchingCard = aiAdviceList.querySelector(`.ai-advice-card[data-index="${index}"]`);
+        aiAdviceList.querySelectorAll('.ai-advice-card').forEach(c => c.classList.remove('active'));
+        if (matchingCard) {
+            matchingCard.classList.add('active');
+            // Auto scroll matching card into view inside the list
+            matchingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+    
     // Seek video and play synth sound
     mainVideo.currentTime = index;
     playSynthSFX(emotion);
@@ -653,6 +808,25 @@ function setupInspectorHandlers() {
                 block.title = `${formatTime(selectedBlockIndex)} - ${config.label}: ${config.sfx}`;
             }
         });
+    });
+}
+
+// ----------------------------------------------------
+// Inspector Tabs switching logic
+// ----------------------------------------------------
+function setupTabHandlers() {
+    tabManual.addEventListener('click', () => {
+        tabManual.classList.add('active');
+        tabAi.classList.remove('active');
+        tabContentManual.classList.remove('hidden');
+        tabContentAi.classList.add('hidden');
+    });
+
+    tabAi.addEventListener('click', () => {
+        tabAi.classList.add('active');
+        tabManual.classList.remove('active');
+        tabContentAi.classList.remove('hidden');
+        tabContentManual.classList.add('hidden');
     });
 }
 

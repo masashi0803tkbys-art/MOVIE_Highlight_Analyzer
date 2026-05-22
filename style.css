@@ -657,3 +657,221 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
 }
+
+/* Tabs inside Inspector Header */
+.inspector-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.03);
+}
+
+.tab-btn.active {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* AI Co-Pilot content styles */
+.tab-content.hidden {
+    display: none !important;
+}
+
+.ai-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.ai-badge {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ai-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.ai-advice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ai-advice-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.ai-advice-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255,255,255,0.15);
+    transform: translateY(-1px);
+}
+
+.ai-advice-card.active {
+    border-color: var(--accent-color);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.ai-advice-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-advice-time {
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    background: rgba(99, 102, 241, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.ai-advice-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.ai-advice-text {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.ai-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 10px;
+    color: var(--text-secondary);
+    text-align: center;
+    gap: 12px;
+}
+
+.ai-empty-state i {
+    font-size: 2.2rem;
+    color: rgba(255,255,255,0.12);
+}
+
+.ai-empty-state p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+/* -----------------------------------------
+   Mobile Responsive & Sticky Preview styles
+   ----------------------------------------- */
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+    }
+    
+    .app-container {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .main-content {
+        overflow: visible;
+        height: auto;
+        padding: 12px;
+        gap: 16px;
+    }
+    
+    .workspace-area {
+        flex-direction: column;
+        height: auto;
+        min-height: unset;
+        overflow: visible;
+        gap: 16px;
+    }
+    
+    /* Premium Sticky Video Preview Panel on Mobile */
+    .preview-section {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+        height: 200px;
+        min-height: 200px;
+        background: #000;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        margin: -12px -12px 0 -12px; /* Pull flush to viewport sides */
+        border: none;
+        border-bottom: 1px solid var(--panel-border);
+    }
+    
+    .inspector-panel {
+        width: 100%;
+        height: auto;
+        min-height: 320px;
+        backdrop-filter: none;
+        box-shadow: none;
+    }
+    
+    .timeline-section {
+        height: auto;
+        min-height: 380px;
+    }
+    
+    .timeline-editor-wrapper {
+        height: 290px;
+    }
+    
+    .timeline-track-labels {
+        width: 70px;
+    }
+    
+    .track-label {
+        font-size: 0.7rem;
+    }
+    
+    .timeline-tools {
+        display: none; /* Hide legend tools on tiny timeline headers to save space */
+    }
+}

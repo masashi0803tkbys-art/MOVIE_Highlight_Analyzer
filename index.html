@@ -45,10 +45,19 @@
 
                 <div class="inspector-panel hidden" id="inspector-panel">
                     <div class="inspector-header">
-                        <h3><i class="ph ph-sliders"></i> SFX Inspector</h3>
+                        <div class="inspector-tabs">
+                            <button class="tab-btn active" id="tab-manual" data-tab="manual">
+                                <i class="ph ph-sliders"></i> 手動調整
+                            </button>
+                            <button class="tab-btn" id="tab-ai" data-tab="ai">
+                                <i class="ph ph-sparkles"></i> AIアドバイス
+                            </button>
+                        </div>
                         <button class="close-btn" id="close-inspector-btn"><i class="ph ph-x"></i></button>
                     </div>
-                    <div class="inspector-body">
+                    
+                    <!-- Manual Tab Content -->
+                    <div class="inspector-body tab-content" id="tab-content-manual">
                         <div class="selected-time">Time: <span id="inspector-time">00:00</span></div>
                         <div class="emotion-selector-wrapper">
                             <label>Emotion Category</label>
@@ -68,6 +77,20 @@
                         <button class="action-btn play-sfx-btn" id="play-sfx-btn">
                             <i class="ph-fill ph-play-circle"></i> Play Sample Sound
                         </button>
+                    </div>
+
+                    <!-- AI Advice Tab Content -->
+                    <div class="inspector-body tab-content hidden" id="tab-content-ai">
+                        <div class="ai-header">
+                            <span class="ai-badge"><i class="ph-fill ph-sparkles"></i> AI Co-Pilot</span>
+                            <p class="ai-desc">動画の波形解析に基づき、効果的な音響演出のヒントを提案します。</p>
+                        </div>
+                        <div class="ai-advice-list" id="ai-advice-list">
+                            <div class="ai-empty-state">
+                                <i class="ph ph-film-strip"></i>
+                                <p>動画をアップロードすると、AIがクリエイティブなアドバイスを自動作成します。</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
