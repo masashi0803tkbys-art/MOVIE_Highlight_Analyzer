@@ -26,6 +26,7 @@
         </header>
 
         <main class="main-content">
+    <div class="banner">Your App Banner – Scroll down for more content.</div>
             <div class="workspace-area">
                 <div class="preview-section" id="drop-zone">
                     <div class="upload-placeholder" id="upload-placeholder">
@@ -33,7 +34,58 @@
                             <i class="ph ph-film-strip"></i>
                         </div>
                         <h2>Drag & Drop your video here</h2>
-                        <p>or click 'Upload Video' in the top right</p>
+                        <p class="upload-subtext">or click 'Upload Video' in the top right</p>
+                        
+                        <div class="genre-selector-card">
+                            <h3>1. 動画のジャンル・主な被写体を選択</h3>
+                            <div class="genre-grid" id="genre-grid">
+                                <button class="genre-btn active" data-genre="vlog">
+                                    <span class="genre-icon">🐱</span>
+                                    <span class="genre-label">Vlog＆ペット</span>
+                                </button>
+                                <button class="genre-btn" data-genre="gaming">
+                                    <span class="genre-icon">🎮</span>
+                                    <span class="genre-label">ゲーム</span>
+                                </button>
+                                <button class="genre-btn" data-genre="talking">
+                                    <span class="genre-icon">👤</span>
+                                    <span class="genre-label">解説トーク</span>
+                                </button>
+                                <button class="genre-btn" data-genre="scenic">
+                                    <span class="genre-icon">🌄</span>
+                                    <span class="genre-label">風景シネマ</span>
+                                </button>
+                                <button class="genre-btn" data-genre="variety">
+                                    <span class="genre-icon">🎪</span>
+                                    <span class="genre-label">エンタメ</span>
+                                </button>
+                                <button class="genre-btn" data-genre="gadget">
+                                    <span class="genre-icon">🔌</span>
+                                    <span class="genre-label">ガジェットレビュー</span>
+                                </button>
+                                <button class="genre-btn" data-genre="gourmet">
+                                    <span class="genre-icon">🍳</span>
+                                    <span class="genre-label">料理・グルメ</span>
+                                </button>
+                                <button class="genre-btn" data-genre="animation">
+                                    <span class="genre-icon">🎨</span>
+                                    <span class="genre-label">アニメ・CG</span>
+                                </button>
+                                <button class="genre-btn" data-genre="vtuber">
+                                    <span class="genre-icon">👑</span>
+                                    <span class="genre-label">VTuber</span>
+                                </button>
+                                <button class="genre-btn" data-genre="vehicle">
+                                    <span class="genre-icon">🚗</span>
+                                    <span class="genre-label">モータースポーツ</span>
+                                </button>
+                                <button class="genre-btn" data-genre="fitness">
+                                    <span class="genre-icon">🏃</span>
+                                    <span class="genre-label">フィットネス</span>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="genre-tip">※動画をアップロードすると、選択したジャンルと映像の動きに基づいてAIが最適なBGM・効果音を自動分析します。</p>
                     </div>
                     <div class="video-container hidden" id="video-container">
                         <video id="main-video"></video>
@@ -83,8 +135,48 @@
                     <div class="inspector-body tab-content hidden" id="tab-content-ai">
                         <div class="ai-header">
                             <span class="ai-badge"><i class="ph-fill ph-sparkles"></i> AI Co-Pilot</span>
-                            <p class="ai-desc">動画の波形解析に基づき、効果的な音響演出のヒントを提案します。</p>
+                            <p class="ai-desc">動画の映像・音声解析に基づき、最適な音響演出のヒントを提案します。</p>
                         </div>
+
+                        <!-- BGM & Environment Analysis Card -->
+                        <div class="bgm-recommendation-card" id="bgm-recommend-card">
+                            <div class="bgm-card-header">
+                                <div class="bgm-badge" id="analysis-mode-badge"><i class="ph ph-waveform"></i> 音声+映像ハイブリッド解析</div>
+                            </div>
+                            <div class="bgm-details">
+                                <div class="bgm-detail-item">
+                                    <span class="detail-label">検出された雰囲気:</span>
+                                    <span class="detail-value" id="detected-scene">穏やかなペットの日常、和やかで可愛らしい空気感</span>
+                                </div>
+                                <div class="bgm-detail-item">
+                                    <span class="detail-label">想定される被写体:</span>
+                                    <span class="detail-value" id="detected-subjects">犬、猫、楽しそうな飼い主、可愛い生き物</span>
+                                </div>
+                                <div class="bgm-detail-item">
+                                    <span class="detail-label">映像の動き・構図変化:</span>
+                                    <span class="detail-value" id="detected-motion">全体的に安定、時折早い動きを検知</span>
+                                </div>
+                                <div class="bgm-style-info">
+                                    <div class="bgm-style-meta">
+                                        <span class="style-label">推奨BGMスタイル:</span>
+                                        <span class="style-name" id="recommended-bgm-style">アコースティック・ポップ系</span>
+                                    </div>
+                                    <div class="bgm-player-controls">
+                                        <button class="bgm-play-btn" id="bgm-play-btn">
+                                            <i class="ph-fill ph-play-circle"></i> BGMを試聴する
+                                        </button>
+                                        <div class="bgm-visualizer hidden" id="bgm-visualizer">
+                                            <div class="eq-bar"></div>
+                                            <div class="eq-bar"></div>
+                                            <div class="eq-bar"></div>
+                                            <div class="eq-bar"></div>
+                                            <div class="eq-bar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="ai-advice-list" id="ai-advice-list">
                             <div class="ai-empty-state">
                                 <i class="ph ph-film-strip"></i>
