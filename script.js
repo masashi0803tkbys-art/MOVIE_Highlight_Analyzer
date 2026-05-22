@@ -338,6 +338,9 @@ function handleVideoFile(file) {
     
     mainVideo.src = videoUrl;
     
+    // Always show inspector panel once a video is loaded
+    inspectorPanel.classList.remove('hidden');
+    
     // Show analyzing badge
     const overlay = document.getElementById('overlay-info');
     overlay.classList.remove('hidden');
@@ -1389,7 +1392,8 @@ function selectSFXBlock(index) {
 // ----------------------------------------------------
 function setupInspectorHandlers() {
     closeInspectorBtn.addEventListener('click', () => {
-        inspectorPanel.classList.add('hidden');
+        // Switch to manual tab but keep panel visible
+        tabManual.click();
         const prevSelected = sfxTrack.querySelector('.sfx-block.selected');
         if (prevSelected) prevSelected.classList.remove('selected');
         selectedBlockIndex = null;
