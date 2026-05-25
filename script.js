@@ -263,6 +263,9 @@ function init() {
     setupTabHandlers();
     setupGenreSelector();
     setupBGMControls();
+    
+    // Sync BGM recommendation details on load for the default active genre
+    updateBGMRecommendationUI();
 }
 
 function setupGenreSelector() {
@@ -284,9 +287,11 @@ function setupGenreSelector() {
             startSynthBGM(activeGenre);
         }
         
+        // Update BGM recommendation UI immediately, regardless of upload state!
+        updateBGMRecommendationUI();
+        
         // If analysis is already complete, update AI recommendation details dynamically!
         if (currentVideoDuration > 0) {
-            updateBGMRecommendationUI();
             generateAIAdvice(currentVideoDuration);
         }
     });
@@ -335,6 +340,7 @@ function handleVideoFile(file) {
     // Switch UI view
     uploadPlaceholder.classList.add('hidden');
     videoContainer.classList.remove('hidden');
+    dropZone.classList.add('video-loaded');
     
     mainVideo.src = videoUrl;
     
@@ -908,7 +914,10 @@ function updateBGMRecommendationUI() {
     
     const badge = document.getElementById('analysis-mode-badge');
     if (badge) {
-        if (hasAudio) {
+        if (currentVideoDuration === 0) {
+            badge.className = 'bgm-badge';
+            badge.innerHTML = '<i class="ph ph-sparkles"></i> 分析準備完了（推奨BGMプレビュー表示）';
+        } else if (hasAudio) {
             badge.className = 'bgm-badge';
             badge.innerHTML = '<i class="ph-fill ph-waveform"></i> 音声+映像ハイブリッド解析';
         } else {
@@ -924,22 +933,26 @@ function updateBGMRecommendationUI() {
     document.getElementById('detected-subjects').innerText = config.subjects;
     
     // Formulate a dynamic visual composition analysis using calculated visual motion values
-    let averageMotion = 0;
-    if (motionActivityData.length > 0) {
-        const sum = motionActivityData.reduce((a, b) => a + b, 0);
-        averageMotion = sum / motionActivityData.length;
-    }
-    
     let motionDesc = "";
-    if (averageMotion > 0.35) {
-        motionDesc = "カメラワークが活発であり、被写体の素早い動作や激しいカット割りが多く検出されています。";
-    } else if (averageMotion > 0.15) {
-        motionDesc = "なだらかなカメラのパンニング（視点移動）と、適度な被写体の動きが検出されたバランスの良い構図です。";
+    if (currentVideoDuration === 0) {
+        motionDesc = "動画をアップロードすると、映像の動きや構図変化がここに自動分析されます。";
     } else {
-        motionDesc = "固定カメラ撮影を主体とした、構図が非常に安定した落ち着きのある映像構造です。";
+        let averageMotion = 0;
+        if (motionActivityData.length > 0) {
+            const sum = motionActivityData.reduce((a, b) => a + b, 0);
+            averageMotion = sum / motionActivityData.length;
+        }
+        
+        if (averageMotion > 0.35) {
+            motionDesc = `カメラワークが活発であり、被写体の素早い動作や激しいカット割りが多く検出されています。 (平均動き量: ${(averageMotion * 100).toFixed(0)}%)`;
+        } else if (averageMotion > 0.15) {
+            motionDesc = `なだらかなカメラのパンニング（視点移動）と、適度な被写体の動きが検出されたバランスの良い構図です。 (平均動き量: ${(averageMotion * 100).toFixed(0)}%)`;
+        } else {
+            motionDesc = `固定カメラ撮影を主体とした、構図が非常に安定した落ち着きのある映像構造です。 (平均動き量: ${(averageMotion * 100).toFixed(0)}%)`;
+        }
     }
     
-    document.getElementById('detected-motion').innerText = `${motionDesc} (平均動き量: ${(averageMotion * 100).toFixed(0)}%)`;
+    document.getElementById('detected-motion').innerText = motionDesc;
     
     // Display the recommended matching style
     document.getElementById('recommended-bgm-style').innerText = `${config.bgmTitle} (${config.bgmStyle})`;
@@ -1392,8 +1405,8 @@ function selectSFXBlock(index) {
 // ----------------------------------------------------
 function setupInspectorHandlers() {
     closeInspectorBtn.addEventListener('click', () => {
-        // Switch to manual tab but keep panel visible
-        tabManual.click();
+        // Hide inspector panel on close
+        inspectorPanel.classList.add('hidden');
         const prevSelected = sfxTrack.querySelector('.sfx-block.selected');
         if (prevSelected) prevSelected.classList.remove('selected');
         selectedBlockIndex = null;

@@ -276,33 +276,36 @@ body {
     text-align: center;
     color: var(--text-secondary);
     pointer-events: none;
+    width: 100%;
+    max-width: 720px;
+    padding: 10px;
 }
 
 .upload-placeholder .icon-container {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: rgba(99, 102, 241, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
 
 .upload-placeholder i {
-    font-size: 2rem;
+    font-size: 1.6rem;
     color: var(--accent-color);
 }
 
 .upload-placeholder h2 {
     color: var(--text-primary);
-    font-size: 1.2rem;
-    margin-bottom: 8px;
+    font-size: 1.05rem;
+    margin-bottom: 4px;
     font-weight: 600;
 }
 
 .upload-placeholder p {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .video-container {
@@ -806,11 +809,11 @@ body {
    Genre Selector Grid styles
    ----------------------------------------- */
 .genre-selector-card {
-    margin-top: 24px;
+    margin-top: 12px;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--panel-border);
     border-radius: var(--border-radius);
-    padding: 16px;
+    padding: 12px;
     width: 100%;
     max-width: 720px;
     pointer-events: auto; /* Re-enable pointer events since parent is pointer-events: none */
@@ -818,10 +821,10 @@ body {
 }
 
 .genre-selector-card h3 {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     text-align: left;
     display: flex;
     align-items: center;
@@ -832,9 +835,28 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 8px;
-    max-height: 180px;
+    max-height: 110px;
     overflow-y: auto;
     padding: 4px;
+}
+
+/* Custom Scrollbar to match Inspector panel slider structure exactly */
+.genre-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.genre-grid::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.genre-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.genre-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.35);
 }
 
 .genre-btn {
@@ -883,9 +905,9 @@ body {
 }
 
 .genre-tip {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     opacity: 0.6;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 /* -----------------------------------------
@@ -1119,8 +1141,21 @@ body {
         gap: 16px;
     }
     
-    /* Premium Sticky Video Preview Panel on Mobile */
+    /* Mobile Responsive layout for Video Preview Panel */
     .preview-section {
+        position: relative;
+        width: 100%;
+        height: auto;
+        min-height: 380px;
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--border-radius);
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    /* Premium Sticky Video Preview Panel on Mobile (Once video is loaded) */
+    .preview-section.video-loaded {
         position: sticky;
         top: 0;
         z-index: 100;
